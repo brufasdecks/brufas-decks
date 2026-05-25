@@ -9,7 +9,681 @@
   /* Index-scoped styles only — shared tokens and base come from styles.css */
 
   body {
-    max-width: 680px;<!DOCTYPE html>
+    max-width: 680px;<!DOCTYP<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commander Collection Guidebook</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+<style>
+  /* Index-scoped styles only — shared tokens and base come from styles.css */
+
+  body {
+    max-width: 680px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .stat { display: flex; flex-direction: column; gap: 1px; }
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--subtle);
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23888' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 10px center;
+  }
+  .search-input:focus { border-color: var(--accent-mid); }
+  .search-input::placeholder { color: var(--subtle); }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-tab:hover { background: var(--panel-secondary); }
+  .filter-tab.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  /* DECK LIST */
+  .deck-list {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* DECK CARD */
+  .deck-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .deck-card.available:hover {
+    border-color: var(--accent-mid);
+    box-shadow: 0 2px 8px rgba(26,58,92,0.08);
+    text-decoration: none;
+  }
+  .deck-card.coming-soon {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  .deck-info { flex: 1; min-width: 0; }
+  .deck-name {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .deck-card.coming-soon .deck-name { color: var(--muted); }
+  .deck-subtitle {
+    font-size: 12px;
+    color: var(--subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--subtle);
+    font-size: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <p class="header-eyebrow">Commander Collection</p>
+  <h1 class="header-title">Guidebook</h1>
+  <p class="header-subtitle">Deck guides for every commander in the collection</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-number" id="total-count">44</span>
+    <span class="stat-label">Total Decks</span>
+  </div>
+  <div class="stat">
+    <span class="stat-number" id="available-count">14</span>
+    <span class="stat-label">Guides Ready</span>
+  </div>
+  <div class="stat">
+    <span class="stat-number" id="soon-count">30</span>
+    <span class="stat-label">Coming Soon</span>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input class="search-input" type="search" id="search" placeholder="Search decks..." autocomplete="off">
+</div>
+
+<div class="filter-tabs">
+  <button class="filter-tab active" data-filter="all">All</button>
+  <button class="filter-tab" data-filter="available">Available</button>
+  <button class="filter-tab" data-filter="soon">Coming Soon</button>
+</div>
+
+<div class="deck-list" id="deck-list">
+
+  <!-- AVAILABLE GUIDES -->
+
+  <a class="deck-card available" href="guides/admiral-brass-unsinkable-guide.html" data-name="admiral brass unsinkable pirate reanimator" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Admiral Brass, Unsinkable</div>
+      <div class="deck-subtitle">Pirate Reanimator</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/ajani-nacatl-pariah-guide.html" data-name="ajani nacatl pariah cat pride tribal" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Ajani, Nacatl Pariah</div>
+      <div class="deck-subtitle">Cat Pride</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-w">W</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/ashling-the-limitless-guide.html" data-name="ashling the limitless elemental evoke engine" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Ashling, the Limitless</div>
+      <div class="deck-subtitle">Elemental Evoke Engine</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/bello-bard-of-the-brambles-guide.html" data-name="bello bard brambles animated artifacts enchantments gruul" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Bello, Bard of the Brambles</div>
+      <div class="deck-subtitle">Animated Artifacts &amp; Enchantments</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/black-panther-wakandan-king-guide.html" data-name="black panther wakandan king tokens counters selesnya" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Black Panther, Wakandan King</div>
+      <div class="deck-subtitle">Tokens &amp; Counters</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/captain-america-first-avenger-guide.html" data-name="captain america first avenger equipment voltron jeskai" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Captain America, First Avenger</div>
+      <div class="deck-subtitle">Equipment Voltron</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/clavileno-first-of-the-blessed-guide.html" data-name="clavileno first blessed blood rites vampire aristocrats orzhov" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Clavileño, First of the Blessed</div>
+      <div class="deck-subtitle">Blood Rites</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/cloud-ex-soldier-guide.html" data-name="cloud ex-soldier equipment combat naya" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Cloud, Ex-SOLDIER</div>
+      <div class="deck-subtitle">Equipment Combat &amp; Seven-Power Attacks</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div><div class="pip pip-w">W</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/cosmic-spider-man-guide.html" data-name="cosmic spider-man web warriors spider verse five color tribal" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Cosmic Spider-Man</div>
+      <div class="deck-subtitle">Web-Warriors</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/doctor-octopus-master-planner-guide.html" data-name="doctor octopus master planner villain tribal dimir" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Doctor Octopus, Master Planner</div>
+      <div class="deck-subtitle">Villain Tribal Card-Draw Engine</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/dogmeat-ever-loyal-guide.html" data-name="dogmeat ever loyal aura equipment junk naya" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Dogmeat, Ever Loyal</div>
+      <div class="deck-subtitle">Aura &amp; Equipment Combat Value</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div><div class="pip pip-w">W</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/don-and-leo-problem-solvers-guide.html" data-name="don leo problem solvers blink etb azorius" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Don &amp; Leo, Problem Solvers</div>
+      <div class="deck-subtitle">Problem Solvers</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/donatello-mutant-mechanic-guide.html" data-name="donatello mutant mechanic artifact engine mono blue" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Donatello, Mutant Mechanic</div>
+      <div class="deck-subtitle">Does Multiversal Machines</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <a class="deck-card available" href="guides/morska-undersea-sleuth-guide.html" data-name="morska undersea sleuth clue tokens bant" data-status="available">
+    <div class="deck-info">
+      <div class="deck-name">Morska, Undersea Sleuth</div>
+      <div class="deck-subtitle">Deep Clue Sea</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-available">Available</span>
+  </a>
+
+  <!-- COMING SOON -->
+
+  <div class="deck-card coming-soon" data-name="eddie brock lethal protector" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Eddie Brock | Lethal Protector</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-g">G</div><div class="pip pip-c">C</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="elsha threefold master pugnacious pugilists" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Elsha, Threefold Master</div>
+      <div class="deck-subtitle">Pugnacious Pugilists</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="eowyn aragorn riders of rohan" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Eowyn &amp; Aragorn</div>
+      <div class="deck-subtitle">Riders of Rohan</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="ezio fear not darkness" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Ezio | Fear Not the Darkness</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="felothar abzan armor" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Felothar | Abzan Armor</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="gev im burning for you" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Gev | I'm Burnin' for You</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="hei bai forest guardian blinkchanted" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Hei Bai, Forest Guardian</div>
+      <div class="deck-subtitle">Blinkchanted</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="iron man skip spinning rims" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Iron Man | Skip the Spinning Rims</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="kotori buckle up" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Kotori | Buckle Up</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="kykar ghostbusters" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Kykar | Ghostbusters</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="leonardo et al don't cut em no slack" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Leonardo et al</div>
+      <div class="deck-subtitle">Don't Cut 'Em No Slack</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="norman osborn something of a scientist myself" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Norman Osborn</div>
+      <div class="deck-subtitle">Something of a Scientist Myself</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="optimus prime counter intelligence" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Optimus Prime | Counter Intelligence</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="pantlaza sun-favored velci-ramp-tor" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Pantlaza, Sun-Favored</div>
+      <div class="deck-subtitle">Velci-Ramp-Tor</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="peter parker yoink" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Peter Parker | Yoink!</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="quintorius lorehold spirit" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Quintorius | Lorehold Spirit</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="ragost ludicrous lobster" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Ragost | Ludicrous Lobster</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="sensational spider-man webbed up" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Sensational Spider-Man | Webbed Up</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="sidar jabari zhalfir good horsemanship" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Sidar Jabari of Zhalfir</div>
+      <div class="deck-subtitle">Good Horsemanship</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="sonic hedgehog robot alliance" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Sonic the Hedgehog | Robot Alliance</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="stella lee wild card" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Stella Lee | Wild Card</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="temmet eternal might" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Temmet | Eternal Might</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="the fourth doctor blast from the past" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">The Fourth Doctor</div>
+      <div class="deck-subtitle">Blast from the Past</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="the necrobloom pure dredgery" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">The Necrobloom | Pure Dredgery</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="the swarmlord tyranid swarm" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">The Swarmlord | Tyranid Swarm</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="the tenth doctor rose tyler timey-wimey" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">The Tenth Doctor &amp; Rose Tyler</div>
+      <div class="deck-subtitle">Timey-Wimey</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="tifa power boost" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Tifa | Power Boost</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="ulalek eldritch elimination services" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Ulalek | Eldritch Elimination Services</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="usagi yojimbo honor and duty" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Usagi Yojimbo | Honor and Duty</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="valgavoth endless punishment" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Valgavoth | Endless Punishment</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="wolverine knife hands" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Wolverine | Knife Hands</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="yuriko ghostly blade" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Yuriko | Ghostly Blade</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="zhulodok eldrazi unbound" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Zhulodok | Eldrazi Unbound</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-c">C</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+  <div class="deck-card coming-soon" data-name="zurgo mardu surge" data-status="soon">
+    <div class="deck-info">
+      <div class="deck-name">Zurgo | Mardu Surge</div>
+      <div class="deck-subtitle">—</div>
+    </div>
+    <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="badge badge-soon">Coming Soon</span>
+  </div>
+
+</div>
+
+<div class="empty-state" id="empty-state">No decks match your search.</div>
+
+<footer class="site-footer">
+  Commander Collection Guidebook &nbsp;·&nbsp; <span id="footer-year">2026</span>
+</footer>
+
+<script>
+  const search = document.getElementById('search');
+  const tabs = document.querySelectorAll('.filter-tab');
+  const cards = document.querySelectorAll('.deck-card');
+  const emptyState = document.getElementById('empty-state');
+  const deckList = document.getElementById('deck-list');
+  let activeFilter = 'all';
+
+  function updateCounts() {
+    const visible = [...cards].filter(c => c.style.display !== 'none');
+    document.getElementById('total-count').textContent = cards.length;
+    document.getElementById('available-count').textContent = [...cards].filter(c => c.dataset.status === 'available').length;
+    document.getElementById('soon-count').textContent = [...cards].filter(c => c.dataset.status === 'soon').length;
+  }
+
+  function filterCards() {
+    const q = search.value.toLowerCase().trim();
+    let visibleCount = 0;
+    cards.forEach(card => {
+      const name = card.dataset.name || '';
+      const matchesSearch = !q || name.includes(q);
+      const matchesFilter = activeFilter === 'all' || card.dataset.status === activeFilter;
+      const show = matchesSearch && matchesFilter;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+    emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  search.addEventListener('input', filterCards);
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeFilter = tab.dataset.filter;
+      filterCards();
+    });
+  });
+
+  updateCounts();
+</script>
+</body>
+</html>
+E html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
