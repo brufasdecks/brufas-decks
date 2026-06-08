@@ -6,12 +6,19 @@
 <title>Commander Collection Guidebook</title>
 <link rel="stylesheet" href="assets/css/styles.css">
 <style>
-  /* Index-scoped styles only — shared tokens and base come from styles.css */
-
   body {
     max-width: 680px;
     margin: 0 auto;
     min-height: 100vh;
+  }
+
+  /* PURPOSE STATEMENT */
+  .purpose-strip {
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
   }
 
   /* STATS BAR */
@@ -37,13 +44,68 @@
     color: var(--subtle);
   }
 
-  /* SEARCH */
-  .search-wrap {
+  /* HOW TO USE */
+  .how-to-use {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--panel);
+  }
+  .how-to-use-title {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.65rem;
+  }
+  .how-to-use ol {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 0;
+  }
+  .how-to-use li {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+  }
+  .how-to-use li::before {
+    content: attr(data-step);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light, #e6eff7);
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* SEARCH + FILTER AREA */
+  .discovery-area {
     padding: 0.75rem 1.5rem;
     border-bottom: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .search-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
   .search-input {
-    width: 100%;
+    flex: 1;
     padding: 8px 12px 8px 34px;
     font-family: var(--font-body);
     font-size: 14px;
@@ -60,21 +122,31 @@
   .search-input:focus { border-color: var(--accent-mid); }
   .search-input::placeholder { color: var(--subtle); }
 
-  /* FILTER TABS */
-  .filter-tabs {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid var(--border-light);
-    overflow-x: auto;
-    scrollbar-width: none;
+  .filter-select {
+    padding: 8px 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    white-space: nowrap;
   }
-  .filter-tabs::-webkit-scrollbar { display: none; }
-  .filter-tab {
-    flex-shrink: 0;
-    padding: 4px 12px;
+  .filter-select:focus { border-color: var(--accent-mid); }
+
+  /* TAG CHIPS */
+  .tag-chips {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .tag-chip {
+    padding: 3px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     border: 1px solid var(--border);
     background: var(--panel);
@@ -82,13 +154,38 @@
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
+    user-select: none;
   }
-  .filter-tab:hover { background: var(--panel-secondary); }
-  .filter-tab.active {
+  .tag-chip:hover { background: var(--panel-secondary); }
+  .tag-chip.active {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
   }
+  .tag-chip-clear {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--subtle);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .tag-chip-clear.visible { display: inline-flex; align-items: center; gap: 4px; }
+  .tag-chip-clear:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* RESULT COUNT */
+  .result-count {
+    padding: 0.4rem 1.5rem;
+    font-size: 12px;
+    color: var(--subtle);
+    border-bottom: 1px solid var(--border-light);
+    display: none;
+  }
+  .result-count.visible { display: block; }
 
   /* DECK LIST */
   .deck-list {
@@ -120,7 +217,6 @@
     opacity: 0.55;
     cursor: default;
   }
-
   .deck-info { flex: 1; min-width: 0; }
   .deck-name {
     font-family: var(--font-display);
@@ -139,6 +235,18 @@
     text-overflow: ellipsis;
   }
 
+  /* COMPLEXITY BADGE on card */
+  .complexity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    title: attr(title);
+  }
+  .complexity-dot[data-level="beginner"]     { background: #4caf50; }
+  .complexity-dot[data-level="intermediate"] { background: #ff9800; }
+  .complexity-dot[data-level="advanced"]     { background: #f44336; }
+
   /* EMPTY STATE */
   .empty-state {
     text-align: center;
@@ -146,6 +254,10 @@
     color: var(--subtle);
     font-size: 14px;
     display: none;
+  }
+  .empty-state-hint {
+    margin-top: 0.5rem;
+    font-size: 13px;
   }
 </style>
 </head>
@@ -156,6 +268,10 @@
   <h1 class="header-title">A Guide to the Multiverse</h1>
   <p class="header-subtitle">A guide to all of Brufa's commander decks.</p>
 </header>
+
+<div class="purpose-strip">
+  Each guide is built to help someone understand, pilot, and remember the core plan of one of Brufa's Commander decks.
+</div>
 
 <div class="stats-bar">
   <div class="stat">
@@ -172,509 +288,999 @@
   </div>
 </div>
 
-<div class="search-wrap">
-  <input class="search-input" type="search" id="search" placeholder="Search decks..." autocomplete="off">
+<div class="how-to-use" id="how-to-use">
+  <div class="how-to-use-title">How to Use These Guides</div>
+  <ol>
+    <li data-step="1">Pick a deck by commander, color, theme, or playstyle using the search and filters below.</li>
+    <li data-step="2">Read the <strong>Executive Summary</strong> to understand the game plan at a glance.</li>
+    <li data-step="3">Use the <strong>Early / Mid / Late Game</strong> sections while learning the deck at the table.</li>
+    <li data-step="4">Open the <strong>Moxfield link</strong> inside the guide for the full decklist.</li>
+  </ol>
 </div>
 
-<div class="filter-tabs">
-  <button class="filter-tab active" data-filter="all">All</button>
-  <button class="filter-tab" data-filter="available">Available</button>
-  <button class="filter-tab" data-filter="soon">Coming Soon</button>
+<div class="discovery-area">
+  <div class="search-row">
+    <label for="search" class="sr-only">Search decks</label>
+    <input class="search-input" type="search" id="search" placeholder="Search by name, theme, color, tag…" autocomplete="off" aria-label="Search decks">
+    <select class="filter-select" id="color-filter" aria-label="Filter by color identity">
+      <option value="">Any color</option>
+      <option value="W">Mono White</option>
+      <option value="U">Mono Blue</option>
+      <option value="B">Mono Black</option>
+      <option value="R">Mono Red</option>
+      <option value="G">Mono Green</option>
+      <option value="C">Colorless</option>
+      <option value="WU">Azorius (W/U)</option>
+      <option value="WB">Orzhov (W/B)</option>
+      <option value="WR">Boros (W/R)</option>
+      <option value="WG">Selesnya (W/G)</option>
+      <option value="UB">Dimir (U/B)</option>
+      <option value="UR">Izzet (U/R)</option>
+      <option value="UG">Simic (U/G)</option>
+      <option value="BR">Rakdos (B/R)</option>
+      <option value="BG">Golgari (B/G)</option>
+      <option value="RG">Gruul (R/G)</option>
+      <option value="WUB">Esper (W/U/B)</option>
+      <option value="WUR">Jeskai (W/U/R)</option>
+      <option value="WUG">Bant (W/U/G)</option>
+      <option value="WBR">Mardu (W/B/R)</option>
+      <option value="WBG">Abzan (W/B/G)</option>
+      <option value="WRG">Naya (W/R/G)</option>
+      <option value="UBR">Grixis (U/B/R)</option>
+      <option value="UBG">Sultai (U/B/G)</option>
+      <option value="URG">Temur (U/R/G)</option>
+      <option value="BRG">Jund (B/R/G)</option>
+      <option value="WUBR">Non-Green 4c</option>
+      <option value="WUBG">Non-Red 4c</option>
+      <option value="WURG">Non-Black 4c</option>
+      <option value="WBRG">Non-Blue 4c</option>
+      <option value="UBRG">Non-White 4c</option>
+      <option value="WUBRG">Five Color</option>
+    </select>
+    <select class="filter-select" id="complexity-filter" aria-label="Filter by complexity">
+      <option value="">Any complexity</option>
+      <option value="beginner">Beginner Friendly</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+  <div class="tag-chips" id="tag-chips" role="group" aria-label="Filter by tag">
+    <button class="tag-chip" data-tag="tribal">Tribal</button>
+    <button class="tag-chip" data-tag="tokens">Tokens</button>
+    <button class="tag-chip" data-tag="artifacts">Artifacts</button>
+    <button class="tag-chip" data-tag="enchantments">Enchantments</button>
+    <button class="tag-chip" data-tag="graveyard">Graveyard</button>
+    <button class="tag-chip" data-tag="combat">Combat</button>
+    <button class="tag-chip" data-tag="voltron">Voltron</button>
+    <button class="tag-chip" data-tag="counters">Counters</button>
+    <button class="tag-chip" data-tag="spellslinger">Spellslinger</button>
+    <button class="tag-chip" data-tag="big-mana">Big Mana</button>
+    <button class="tag-chip" data-tag="combo">Combo</button>
+    <button class="tag-chip" data-tag="blink">Blink</button>
+    <button class="tag-chip" data-tag="theft">Theft</button>
+    <button class="tag-chip" data-tag="aristocrats">Aristocrats</button>
+    <button class="tag-chip" data-tag="reanimator">Reanimator</button>
+    <button class="tag-chip" data-tag="go-wide">Go-Wide</button>
+    <button class="tag-chip" data-tag="control">Control</button>
+    <button class="tag-chip" data-tag="beginner-friendly">Beginner Friendly</button>
+    <button class="tag-chip" data-tag="marvel">Marvel</button>
+    <button class="tag-chip" data-tag="tmnt">TMNT</button>
+    <button class="tag-chip" data-tag="final-fantasy">Final Fantasy</button>
+    <button class="tag-chip" data-tag="doctor-who">Doctor Who</button>
+    <button class="tag-chip" data-tag="lotr">LotR</button>
+    <button class="tag-chip" data-tag="video-games">Video Games</button>
+    <button class="tag-chip-clear" id="clear-tags" aria-label="Clear all active tag filters">✕ Clear filters</button>
+  </div>
 </div>
 
+<div class="result-count" id="result-count" aria-live="polite"></div>
 
 <div class="deck-list" id="deck-list">
 
-  <a class="deck-card available" href="guides/admiral-brass-unsinkable.html" data-name="admiral brass unsinkable ahoy mateys pirate" data-status="available">
+  <a class="deck-card available" href="guides/admiral-brass-unsinkable.html"
+     data-name="admiral brass unsinkable ahoy mateys pirate"
+     data-status="available"
+     data-colors="UBR"
+     data-tags="tribal, reanimator, pirate, combat, graveyard"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Admiral Brass, Unsinkable</div>
       <div class="deck-subtitle">Ahoy Mateys</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/ajani-nacatl-pariah.html" data-name="ajani nacatl pariah thundercats cat" data-status="available">
+  <a class="deck-card available" href="guides/ajani-nacatl-pariah.html"
+     data-name="ajani nacatl pariah thundercats cat tribal"
+     data-status="available"
+     data-colors="WR"
+     data-tags="tribal, tokens, combat, go-wide, beginner-friendly"
+     data-complexity="beginner"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Ajani, Nacatl Pariah</div>
       <div class="deck-subtitle">Thundercats</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-w">W</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/aminatou-miracle-worker.html" data-name="aminatou veil piercer miracle worker enchantress esper" data-status="available">
+  <a class="deck-card available" href="guides/aminatou-miracle-worker.html"
+     data-name="aminatou veil piercer miracle worker enchantress esper constellation"
+     data-status="available"
+     data-colors="WUB"
+     data-tags="enchantments, control, engine, pillowfort, combo"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Aminatou, Veil Piercer</div>
       <div class="deck-subtitle">Miracle Worker</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/ashling-the-limitless.html" data-name="ashling the limitless dance of the elements elemental" data-status="available">
+  <a class="deck-card available" href="guides/ashling-the-limitless.html"
+     data-name="ashling the limitless dance of the elements elemental five color"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="tribal, elemental, tokens, go-wide, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Ashling, the Limitless</div>
       <div class="deck-subtitle">Dance of the Elements</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/bello-bard-of-the-brambles.html" data-name="bello bard brambles animated army" data-status="available">
+  <a class="deck-card available" href="guides/bello-bard-of-the-brambles.html"
+     data-name="bello bard brambles animated army artifacts enchantments gruul"
+     data-status="available"
+     data-colors="RG"
+     data-tags="artifacts, enchantments, combat, go-wide, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Bello, Bard of the Brambles</div>
       <div class="deck-subtitle">Animated Army</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/black-panther-wakandan-king.html" data-name="black panther wakandan king token triumph" data-status="available">
+  <a class="deck-card available" href="guides/black-panther-wakandan-king.html"
+     data-name="black panther wakandan king token triumph selesnya marvel"
+     data-status="available"
+     data-colors="WG"
+     data-tags="tokens, counters, go-wide, combat, beginner-friendly, marvel"
+     data-complexity="beginner"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Black Panther, Wakandan King</div>
       <div class="deck-subtitle">Token Triumph</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/captain-america-first-avenger.html" data-name="captain america first avenger yeet" data-status="available">
+  <a class="deck-card available" href="guides/captain-america-first-avenger.html"
+     data-name="captain america first avenger yeet equipment voltron jeskai marvel"
+     data-status="available"
+     data-colors="WUR"
+     data-tags="voltron, combat, tokens, equipment, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Captain America, First Avenger</div>
       <div class="deck-subtitle">Yeet!</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/clavileno-first-of-the-blessed.html" data-name="clavileno first of the blessed blood rites" data-status="available">
+  <a class="deck-card available" href="guides/clavileno-first-of-the-blessed.html"
+     data-name="clavileno first of the blessed blood rites vampire aristocrats orzhov"
+     data-status="available"
+     data-colors="WB"
+     data-tags="tribal, aristocrats, tokens, graveyard, vampire"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Clavileño, First of the Blessed</div>
       <div class="deck-subtitle">Blood Rites</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/cloud-ex-soldier.html" data-name="cloud ex-soldier limit break equipment" data-status="available">
+  <a class="deck-card available" href="guides/cloud-ex-soldier.html"
+     data-name="cloud ex-soldier limit break equipment combat naya final fantasy"
+     data-status="available"
+     data-colors="WRG"
+     data-tags="voltron, equipment, combat, counters, final-fantasy, video-games"
+     data-complexity="intermediate"
+     data-theme="Final Fantasy">
     <div class="deck-info">
       <div class="deck-name">Cloud, Ex-SOLDIER</div>
       <div class="deck-subtitle">Limit Break</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div><div class="pip pip-w">W</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/cosmic-spider-man.html" data-name="cosmic spider-man captain universe web warriors" data-status="available">
+  <a class="deck-card available" href="guides/cosmic-spider-man.html"
+     data-name="cosmic spider-man captain universe web warriors five color spider-verse marvel"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="tribal, tokens, go-wide, combat, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Cosmic Spider-Man</div>
       <div class="deck-subtitle">Captain Universe</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/doctor-octopus-master-planner.html" data-name="doctor octopus master planner power of the sun villain" data-status="available">
+  <a class="deck-card available" href="guides/doctor-octopus-master-planner.html"
+     data-name="doctor octopus master planner power of the sun villain tribal dimir marvel"
+     data-status="available"
+     data-colors="UB"
+     data-tags="tribal, engine, card-draw, control, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Doctor Octopus, Master Planner</div>
       <div class="deck-subtitle">Power of the Sun</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/dogmeat-ever-loyal.html" data-name="dogmeat ever loyal scrappy survivors" data-status="available">
+  <a class="deck-card available" href="guides/dogmeat-ever-loyal.html"
+     data-name="dogmeat ever loyal scrappy survivors aura equipment junk naya fallout"
+     data-status="available"
+     data-colors="WRG"
+     data-tags="voltron, equipment, graveyard, tokens, beginner-friendly, video-games"
+     data-complexity="beginner"
+     data-theme="Video Games">
     <div class="deck-info">
       <div class="deck-name">Dogmeat, Ever Loyal</div>
       <div class="deck-subtitle">Scrappy Survivors</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div><div class="pip pip-w">W</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/don-and-leo-problem-solvers.html" data-name="don leo problem solvers" data-status="available">
+  <a class="deck-card available" href="guides/don-and-leo-problem-solvers.html"
+     data-name="don leo problem solvers blink etb azorius tmnt"
+     data-status="available"
+     data-colors="WU"
+     data-tags="blink, tokens, combat, go-wide, tmnt"
+     data-complexity="intermediate"
+     data-theme="TMNT">
     <div class="deck-info">
       <div class="deck-name">Don &amp; Leo, Problem Solvers</div>
       <div class="deck-subtitle">Problem Solvers</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/donatello-mutant-mechanic.html" data-name="donatello mutant mechanic does multiversal machines" data-status="available">
+  <a class="deck-card available" href="guides/donatello-mutant-mechanic.html"
+     data-name="donatello mutant mechanic does multiversal machines artifact mono blue tmnt"
+     data-status="available"
+     data-colors="U"
+     data-tags="artifacts, engine, combo, spellslinger, tmnt"
+     data-complexity="advanced"
+     data-theme="TMNT">
     <div class="deck-info">
       <div class="deck-name">Donatello, Mutant Mechanic</div>
       <div class="deck-subtitle">Does Multiversal Machines</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/eddie-brock-lethal-protector.html" data-name="eddie brock venom lethal protector" data-status="available">
+  <a class="deck-card available" href="guides/eddie-brock-lethal-protector.html"
+     data-name="eddie brock venom lethal protector marvel"
+     data-status="available"
+     data-colors="BRG"
+     data-tags="combat, tokens, engine, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Eddie Brock // Venom, Lethal Protector</div>
       <div class="deck-subtitle">Lethal Protector</div>
     </div>
     <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/elsha-threefold-master.html" data-name="elsha threefold master pugnacious pugilists" data-status="available">
+  <a class="deck-card available" href="guides/elsha-threefold-master.html"
+     data-name="elsha threefold master pugnacious pugilists tmnt"
+     data-status="available"
+     data-colors="WURG"
+     data-tags="combat, counters, go-wide, tokens, tmnt"
+     data-complexity="intermediate"
+     data-theme="TMNT">
     <div class="deck-info">
       <div class="deck-name">Elsha, Threefold Master</div>
       <div class="deck-subtitle">Pugnacious Pugilists</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/eowyn-aragorn-riders-of-rohan.html" data-name="eowyn aragorn riders of rohan" data-status="available">
+  <a class="deck-card available" href="guides/eowyn-aragorn-riders-of-rohan.html"
+     data-name="eowyn aragorn riders of rohan lotr lord of the rings bant"
+     data-status="available"
+     data-colors="WUG"
+     data-tags="tokens, combat, go-wide, counters, lotr"
+     data-complexity="beginner"
+     data-theme="LotR">
     <div class="deck-info">
       <div class="deck-name">Éowyn &amp; Aragorn</div>
       <div class="deck-subtitle">Riders of Rohan</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/ezio-fear-not-the-darkness.html" data-name="ezio auditore fear not the darkness" data-status="available">
+  <a class="deck-card available" href="guides/ezio-fear-not-the-darkness.html"
+     data-name="ezio auditore fear not the darkness five color assassins creed video games"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="tribal, combat, go-wide, tokens, video-games"
+     data-complexity="intermediate"
+     data-theme="Video Games">
     <div class="deck-info">
       <div class="deck-name">Ezio Auditore da Firenze</div>
       <div class="deck-subtitle">Fear Not the Darkness</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/felothar-abzan-armor.html" data-name="felothar abzan armor" data-status="available">
+  <a class="deck-card available" href="guides/felothar-abzan-armor.html"
+     data-name="felothar abzan armor equipment voltron"
+     data-status="available"
+     data-colors="WBG"
+     data-tags="voltron, equipment, combat, counters"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Felothar</div>
       <div class="deck-subtitle">Abzan Armor</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/gev-burnin-for-you.html" data-name="gev scaled scorch im burnin for you" data-status="available">
+  <a class="deck-card available" href="guides/gev-burnin-for-you.html"
+     data-name="gev scaled scorch im burnin for you rakdos burn damage"
+     data-status="available"
+     data-colors="BR"
+     data-tags="combat, tokens, aristocrats, go-wide"
+     data-complexity="beginner"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Gev, Scaled Scorch</div>
       <div class="deck-subtitle">I'm Burnin' for You</div>
     </div>
     <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/hei-bai-forest-guardian-blinkchanted.html" data-name="hei bai forest guardian blinkchanted" data-status="available">
+  <a class="deck-card available" href="guides/hei-bai-forest-guardian-blinkchanted.html"
+     data-name="hei bai forest guardian blinkchanted five color blink etb enchantments spirits"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="blink, enchantments, tokens, engine, combo"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Hei Bai, Forest Guardian</div>
       <div class="deck-subtitle">Blinkchanted</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/iron-man-skip-the-spinning-rims.html" data-name="iron man armored avenger skip the spinning rims" data-status="available">
+  <a class="deck-card available" href="guides/iron-man-skip-the-spinning-rims.html"
+     data-name="iron man armored avenger skip the spinning rims artifacts izzet marvel"
+     data-status="available"
+     data-colors="UR"
+     data-tags="artifacts, engine, spellslinger, tokens, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Iron Man, Armored Avenger</div>
       <div class="deck-subtitle">Skip the Spinning Rims</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/kotori-buckle-up.html" data-name="kotori pilot prodigy buckle up" data-status="available">
+  <a class="deck-card available" href="guides/kotori-buckle-up.html"
+     data-name="kotori pilot prodigy buckle up vehicles azorius"
+     data-status="available"
+     data-colors="WU"
+     data-tags="artifacts, combat, tokens, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Kotori, Pilot Prodigy</div>
       <div class="deck-subtitle">Buckle Up</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/kykar-ghostbusters.html" data-name="kykar winds fury ghostbusters" data-status="available">
+  <a class="deck-card available" href="guides/kykar-ghostbusters.html"
+     data-name="kykar winds fury ghostbusters spirits tokens spellslinger jeskai"
+     data-status="available"
+     data-colors="WUR"
+     data-tags="tokens, spellslinger, tribal, go-wide, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Kykar, Wind's Fury</div>
       <div class="deck-subtitle">Ghostbusters</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/leonardo-et-al-dont-cut-em-no-slack.html" data-name="leonardo et al foot clan dont cut em no slack" data-status="available">
+  <a class="deck-card available" href="guides/leonardo-et-al-dont-cut-em-no-slack.html"
+     data-name="leonardo et al foot clan dont cut em no slack five color tmnt"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="tribal, combat, tokens, go-wide, tmnt"
+     data-complexity="intermediate"
+     data-theme="TMNT">
     <div class="deck-info">
       <div class="deck-name">Leonardo et al., The Foot Clan</div>
       <div class="deck-subtitle">Don't Cut 'Em No Slack</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/morska-undersea-sleuth.html" data-name="morska undersea sleuth deep clue sea" data-status="available">
+  <a class="deck-card available" href="guides/morska-undersea-sleuth.html"
+     data-name="morska undersea sleuth deep clue sea clues tokens bant"
+     data-status="available"
+     data-colors="WUG"
+     data-tags="tokens, artifacts, engine, combo, card-draw"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Morska, Undersea Sleuth</div>
       <div class="deck-subtitle">Deep Clue Sea</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/norman-osborn-something-of-a-scientist-myself.html" data-name="norman osborn green goblin something of a scientist myself" data-status="available">
+  <a class="deck-card available" href="guides/norman-osborn-something-of-a-scientist-myself.html"
+     data-name="norman osborn green goblin something of a scientist myself grixis marvel"
+     data-status="available"
+     data-colors="UBR"
+     data-tags="tokens, artifacts, engine, combo, marvel"
+     data-complexity="advanced"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Norman Osborn, the Green Goblin</div>
       <div class="deck-subtitle">Something of a Scientist Myself</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/optimus-prime-counter-intelligence.html" data-name="optimus prime autobot leader counter intelligence" data-status="available">
+  <a class="deck-card available" href="guides/optimus-prime-counter-intelligence.html"
+     data-name="optimus prime autobot leader counter intelligence artifacts transformers"
+     data-status="available"
+     data-colors="WUR"
+     data-tags="artifacts, voltron, combat, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Optimus Prime, Autobot Leader</div>
       <div class="deck-subtitle">Counter Intelligence</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/pantlaza-velci-ramp-tor.html" data-name="pantlaza sun-favored velci-ramp-tor dinosaur" data-status="available">
+  <a class="deck-card available" href="guides/pantlaza-velci-ramp-tor.html"
+     data-name="pantlaza sun-favored velci-ramp-tor dinosaur tribal discover"
+     data-status="available"
+     data-colors="WUR"
+     data-tags="tribal, big-mana, combat, engine, dinosaur"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Pantlaza, Sun-Favored</div>
       <div class="deck-subtitle">Velci-Ramp-Tor</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/peter-parker-yoink.html" data-name="peter parker amazing spider-man yoink" data-status="available">
+  <a class="deck-card available" href="guides/peter-parker-yoink.html"
+     data-name="peter parker amazing spider-man yoink theft bant marvel"
+     data-status="available"
+     data-colors="WUG"
+     data-tags="theft, tokens, combat, engine, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Peter Parker, the Amazing Spider-Man</div>
       <div class="deck-subtitle">Yoink!</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/quintorius-lorehold-spirit.html" data-name="quintorius field historian lorehold spirit" data-status="available">
+  <a class="deck-card available" href="guides/quintorius-lorehold-spirit.html"
+     data-name="quintorius field historian lorehold spirit graveyard tokens boros"
+     data-status="available"
+     data-colors="WR"
+     data-tags="graveyard, tokens, combat, engine, beginner-friendly"
+     data-complexity="beginner"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Quintorius, Field Historian</div>
       <div class="deck-subtitle">Lorehold Spirit</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/ragost-ludicrous-lobster.html" data-name="ragost ludicrous lobster" data-status="available">
+  <a class="deck-card available" href="guides/ragost-ludicrous-lobster.html"
+     data-name="ragost ludicrous lobster boros tokens combat"
+     data-status="available"
+     data-colors="WR"
+     data-tags="tokens, combat, go-wide, beginner-friendly"
+     data-complexity="beginner"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Ragost</div>
       <div class="deck-subtitle">Ludicrous Lobster</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/sensational-spider-man-webbed-up.html" data-name="sensational spider-man webbed up" data-status="available">
+  <a class="deck-card available" href="guides/sensational-spider-man-webbed-up.html"
+     data-name="sensational spider-man webbed up azorius marvel"
+     data-status="available"
+     data-colors="WU"
+     data-tags="combat, tokens, control, marvel"
+     data-complexity="intermediate"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Sensational Spider-Man</div>
       <div class="deck-subtitle">Webbed Up</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/sidar-jabari-of-zhalfir-good-horsemanship.html" data-name="sidar jabari of zhalfir good horsemanship" data-status="available">
+  <a class="deck-card available" href="guides/sidar-jabari-of-zhalfir-good-horsemanship.html"
+     data-name="sidar jabari of zhalfir good horsemanship esper knight tribal"
+     data-status="available"
+     data-colors="WUB"
+     data-tags="tribal, combat, tokens, go-wide"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Sidar Jabari of Zhalfir</div>
       <div class="deck-subtitle">Good Horsemanship</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/sonic-the-hedgehog-robot-alliance.html" data-name="sonic the hedgehog robot alliance" data-status="available">
+  <a class="deck-card available" href="guides/sonic-the-hedgehog-robot-alliance.html"
+     data-name="sonic the hedgehog robot alliance artifacts jeskai video games sega"
+     data-status="available"
+     data-colors="WUR"
+     data-tags="artifacts, tokens, combat, engine, video-games"
+     data-complexity="intermediate"
+     data-theme="Video Games">
     <div class="deck-info">
       <div class="deck-name">Sonic the Hedgehog</div>
       <div class="deck-subtitle">Robot Alliance</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/stella-lee-wild-card.html" data-name="stella lee wild card" data-status="available">
+  <a class="deck-card available" href="guides/stella-lee-wild-card.html"
+     data-name="stella lee wild card izzet spells copy free cast"
+     data-status="available"
+     data-colors="UR"
+     data-tags="spellslinger, combo, engine, big-mana"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Stella Lee, Wild Card</div>
       <div class="deck-subtitle">Wild Card</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/temmet-eternal-might.html" data-name="temmet naktamuns will eternal might" data-status="available">
+  <a class="deck-card available" href="guides/temmet-eternal-might.html"
+     data-name="temmet naktamuns will eternal might esper tokens clone"
+     data-status="available"
+     data-colors="WUB"
+     data-tags="tokens, go-wide, combat, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Temmet, Naktamun's Will</div>
       <div class="deck-subtitle">Eternal Might</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/the-fourth-doctor-blast-from-the-past.html" data-name="the fourth doctor blast from the past" data-status="available">
+  <a class="deck-card available" href="guides/the-fourth-doctor-blast-from-the-past.html"
+     data-name="the fourth doctor blast from the past doctor who azorius historic"
+     data-status="available"
+     data-colors="WU"
+     data-tags="graveyard, tokens, engine, doctor-who"
+     data-complexity="intermediate"
+     data-theme="Doctor Who">
     <div class="deck-info">
       <div class="deck-name">The Fourth Doctor</div>
       <div class="deck-subtitle">Blast from the Past</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/the-necrobloom-pure-dredgery.html" data-name="the necrobloom pure dredgery" data-status="available">
+  <a class="deck-card available" href="guides/the-necrobloom-pure-dredgery.html"
+     data-name="the necrobloom pure dredgery abzan graveyard dredge land"
+     data-status="available"
+     data-colors="WBG"
+     data-tags="graveyard, tokens, reanimator, engine, big-mana"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">The Necrobloom</div>
       <div class="deck-subtitle">Pure Dredgery</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-b">B</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/the-swarmlord-tyranid-swarm.html" data-name="the swarmlord tyranid swarm" data-status="available">
+  <a class="deck-card available" href="guides/the-swarmlord-tyranid-swarm.html"
+     data-name="the swarmlord tyranid swarm grixis counters combat warhammer 40k"
+     data-status="available"
+     data-colors="UBR"
+     data-tags="tribal, counters, combat, go-wide, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">The Swarmlord</div>
       <div class="deck-subtitle">Tyranid Swarm</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/the-tenth-doctor-rose-tyler-timey-wimey.html" data-name="the tenth doctor rose tyler timey-wimey" data-status="available">
+  <a class="deck-card available" href="guides/the-tenth-doctor-rose-tyler-timey-wimey.html"
+     data-name="the tenth doctor rose tyler timey-wimey bant doctor who extra turns"
+     data-status="available"
+     data-colors="WUG"
+     data-tags="tokens, engine, combo, graveyard, doctor-who"
+     data-complexity="advanced"
+     data-theme="Doctor Who">
     <div class="deck-info">
       <div class="deck-name">The Tenth Doctor &amp; Rose Tyler</div>
       <div class="deck-subtitle">Timey-Wimey</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/tifa-power-boost.html" data-name="tifa lockhart fist of fate power boost" data-status="available">
+  <a class="deck-card available" href="guides/tifa-power-boost.html"
+     data-name="tifa lockhart fist of fate power boost mono green counters final fantasy"
+     data-status="available"
+     data-colors="G"
+     data-tags="counters, combat, voltron, big-mana, beginner-friendly, final-fantasy, video-games"
+     data-complexity="beginner"
+     data-theme="Final Fantasy">
     <div class="deck-info">
       <div class="deck-name">Tifa Lockhart, the Fist of Fate</div>
       <div class="deck-subtitle">Power Boost</div>
     </div>
     <div class="pip-row"><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/ulalek-eldritch-elimination-services.html" data-name="ulalek fused atrocity eldritch elimination services" data-status="available">
+  <a class="deck-card available" href="guides/ulalek-eldritch-elimination-services.html"
+     data-name="ulalek fused atrocity eldritch elimination services five color eldrazi combo"
+     data-status="available"
+     data-colors="WUBRG"
+     data-tags="tribal, combo, big-mana, engine, reanimator, eldrazi"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Ulalek, Fused Atrocity</div>
       <div class="deck-subtitle">Eldritch Elimination Services</div>
     </div>
     <div class="pip-row"><div class="pip pip-w">W</div><div class="pip pip-u">U</div><div class="pip pip-b">B</div><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/usagi-yojimbo-honor-and-duty.html" data-name="miyamoto usagi honor and duty token naya" data-status="available">
+  <a class="deck-card available" href="guides/usagi-yojimbo-honor-and-duty.html"
+     data-name="miyamoto usagi honor and duty token swarm naya rabbit"
+     data-status="available"
+     data-colors="WRG"
+     data-tags="tokens, go-wide, engine, counters, tribal, beginner-friendly"
+     data-complexity="beginner"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Miyamoto Usagi</div>
       <div class="deck-subtitle">Honor and Duty</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div><div class="pip pip-w">W</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/valgavoth-endless-punishment.html" data-name="valgavoth harrower of souls endless punishment rakdos" data-status="available">
+  <a class="deck-card available" href="guides/valgavoth-endless-punishment.html"
+     data-name="valgavoth harrower of souls endless punishment rakdos pain drain control"
+     data-status="available"
+     data-colors="BR"
+     data-tags="control, combat, engine, aristocrats, theft"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Valgavoth, Harrower of Souls</div>
       <div class="deck-subtitle">Endless Punishment</div>
     </div>
     <div class="pip-row"><div class="pip pip-b">B</div><div class="pip pip-r">R</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/wolverine-knife-hands.html" data-name="wolverine wanted mutant knife hands" data-status="available">
+  <a class="deck-card available" href="guides/wolverine-knife-hands.html"
+     data-name="wolverine wanted mutant knife hands gruul combat counters marvel"
+     data-status="available"
+     data-colors="RG"
+     data-tags="voltron, counters, combat, beginner-friendly, marvel"
+     data-complexity="beginner"
+     data-theme="Marvel">
     <div class="deck-info">
       <div class="deck-name">Wolverine, Wanted Mutant</div>
       <div class="deck-subtitle">Knife Hands</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-g">G</div></div>
+    <span class="complexity-dot" data-level="beginner" title="Beginner Friendly"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/yuriko-ghostly-blade.html" data-name="yuriko tigers shadow ghostly blade ninja" data-status="available">
+  <a class="deck-card available" href="guides/yuriko-ghostly-blade.html"
+     data-name="yuriko tigers shadow ghostly blade ninja tribal dimir ninjutsu"
+     data-status="available"
+     data-colors="UB"
+     data-tags="tribal, combat, engine, ninja, theft"
+     data-complexity="advanced"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Yuriko, the Tiger's Shadow</div>
       <div class="deck-subtitle">Ghostly Blade</div>
     </div>
     <div class="pip-row"><div class="pip pip-u">U</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="advanced" title="Advanced"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/zhulodok-eldrazi-unbound.html" data-name="zhulodok void gorger eldrazi unbound colorless" data-status="available">
+  <a class="deck-card available" href="guides/zhulodok-eldrazi-unbound.html"
+     data-name="zhulodok void gorger eldrazi unbound colorless cascade big mana"
+     data-status="available"
+     data-colors="C"
+     data-tags="big-mana, tribal, combat, engine, eldrazi"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Zhulodok, Void Gorger</div>
       <div class="deck-subtitle">Eldrazi Unbound</div>
     </div>
     <div class="pip-row"><div class="pip pip-c">C</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
-  <a class="deck-card available" href="guides/zurgo-mardu-surge.html" data-name="zurgo stormrender mardu surge token aristocrats" data-status="available">
+  <a class="deck-card available" href="guides/zurgo-mardu-surge.html"
+     data-name="zurgo stormrender mardu surge token aristocrats attack value"
+     data-status="available"
+     data-colors="WBR"
+     data-tags="tokens, aristocrats, combat, go-wide, engine"
+     data-complexity="intermediate"
+     data-theme="Magic">
     <div class="deck-info">
       <div class="deck-name">Zurgo Stormrender</div>
       <div class="deck-subtitle">Mardu Surge</div>
     </div>
     <div class="pip-row"><div class="pip pip-r">R</div><div class="pip pip-w">W</div><div class="pip pip-b">B</div></div>
+    <span class="complexity-dot" data-level="intermediate" title="Intermediate"></span>
     <span class="badge badge-available">Available</span>
   </a>
 
 </div>
 
-<div class="empty-state" id="empty-state">No decks match your search.</div>
+<div class="empty-state" id="empty-state">
+  No decks match your search.
+  <div class="empty-state-hint">Try clearing a filter or broadening your search.</div>
+</div>
 
 <footer class="site-footer">
   Commander Collection Guidebook &nbsp;·&nbsp; <span id="footer-year">2026</span>
 </footer>
 
 <script>
-  const search = document.getElementById('search');
-  const tabs = document.querySelectorAll('.filter-tab');
-  const cards = document.querySelectorAll('.deck-card');
-  const emptyState = document.getElementById('empty-state');
-  const deckList = document.getElementById('deck-list');
-  let activeFilter = 'all';
+  // ── DOM refs ──────────────────────────────────────────────────────
+  const searchInput   = document.getElementById('search');
+  const colorFilter   = document.getElementById('color-filter');
+  const complexFilter = document.getElementById('complexity-filter');
+  const tagChips      = document.querySelectorAll('.tag-chip');
+  const clearBtn      = document.getElementById('clear-tags');
+  const cards         = document.querySelectorAll('.deck-card');
+  const emptyState    = document.getElementById('empty-state');
+  const resultCount   = document.getElementById('result-count');
 
-  function updateCounts() {
-    const visible = [...cards].filter(c => c.style.display !== 'none');
-    document.getElementById('total-count').textContent = cards.length;
-    document.getElementById('available-count').textContent = [...cards].filter(c => c.dataset.status === 'available').length;
-    document.getElementById('soon-count').textContent = [...cards].filter(c => c.dataset.status === 'soon').length;
+  let activeTags = new Set();
+
+  // ── Helpers ───────────────────────────────────────────────────────
+  function getCardColors(card) {
+    return (card.dataset.colors || '').split('').filter(Boolean);
+  }
+
+  function colorMatches(card, filterVal) {
+    if (!filterVal) return true;
+    const cardColors = card.dataset.colors || '';
+    // Exact set match: every char in filterVal must be in cardColors and vice versa
+    const filterChars = filterVal.split('');
+    const cardChars   = cardColors.split('');
+    if (filterChars.length !== cardChars.length) return false;
+    return filterChars.every(c => cardChars.includes(c));
+  }
+
+  function tagMatches(card) {
+    if (activeTags.size === 0) return true;
+    const cardTags = (card.dataset.tags || '').split(',').map(t => t.trim());
+    return [...activeTags].every(t => cardTags.includes(t));
+  }
+
+  function complexityMatches(card, filterVal) {
+    if (!filterVal) return true;
+    return (card.dataset.complexity || '') === filterVal;
   }
 
   function filterCards() {
-    const q = search.value.toLowerCase().trim();
-    let visibleCount = 0;
+    const q           = searchInput.value.toLowerCase().trim();
+    const colorVal    = colorFilter.value;
+    const complexVal  = complexFilter.value;
+    let visible       = 0;
+
     cards.forEach(card => {
-      const name = card.dataset.name || '';
-      const matchesSearch = !q || name.includes(q);
-      const matchesFilter = activeFilter === 'all' || card.dataset.status === activeFilter;
-      const show = matchesSearch && matchesFilter;
+      const nameData  = (card.dataset.name  || '').toLowerCase();
+      const tagsData  = (card.dataset.tags  || '').toLowerCase();
+      const themeData = (card.dataset.theme || '').toLowerCase();
+
+      const matchSearch  = !q || nameData.includes(q) || tagsData.includes(q) || themeData.includes(q);
+      const matchColor   = colorMatches(card, colorVal);
+      const matchComplex = complexityMatches(card, complexVal);
+      const matchTags    = tagMatches(card);
+
+      const show = matchSearch && matchColor && matchComplex && matchTags;
       card.style.display = show ? '' : 'none';
-      if (show) visibleCount++;
+      if (show) visible++;
     });
-    emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+
+    // Empty state
+    emptyState.style.display = visible === 0 ? 'block' : 'none';
+
+    // Result count — only show when filters are active
+    const filtersActive = q || colorVal || complexVal || activeTags.size > 0;
+    if (filtersActive) {
+      resultCount.textContent = `${visible} deck${visible !== 1 ? 's' : ''} match`;
+      resultCount.classList.add('visible');
+    } else {
+      resultCount.classList.remove('visible');
+    }
   }
 
-  search.addEventListener('input', filterCards);
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      activeFilter = tab.dataset.filter;
+  // ── Tag chip logic ────────────────────────────────────────────────
+  tagChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const tag = chip.dataset.tag;
+      if (activeTags.has(tag)) {
+        activeTags.delete(tag);
+        chip.classList.remove('active');
+        chip.setAttribute('aria-pressed', 'false');
+      } else {
+        activeTags.add(tag);
+        chip.classList.add('active');
+        chip.setAttribute('aria-pressed', 'true');
+      }
+      clearBtn.classList.toggle('visible', activeTags.size > 0);
       filterCards();
     });
+    chip.setAttribute('aria-pressed', 'false');
+    chip.setAttribute('role', 'button');
   });
 
-  updateCounts();
+  clearBtn.addEventListener('click', () => {
+    activeTags.clear();
+    tagChips.forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
+    clearBtn.classList.remove('visible');
+    filterCards();
+  });
+
+  // ── Search & selects ──────────────────────────────────────────────
+  searchInput.addEventListener('input', filterCards);
+  colorFilter.addEventListener('change', filterCards);
+  complexFilter.addEventListener('change', filterCards);
+
+  // ── Stats (static — all 49 available) ────────────────────────────
+  document.getElementById('total-count').textContent = cards.length;
+  document.getElementById('available-count').textContent = [...cards].filter(c => c.dataset.status === 'available').length;
+  document.getElementById('soon-count').textContent = [...cards].filter(c => c.dataset.status === 'soon').length;
 </script>
 </body>
 </html>
