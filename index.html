@@ -259,6 +259,52 @@
     margin-top: 0.5rem;
     font-size: 13px;
   }
+
+  /* FIND A DECK HEADER */
+  .find-deck-header {
+    padding: 1rem 1.5rem 0.25rem;
+  }
+  .find-deck-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+  .find-deck-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* DOT LEGEND */
+  .dot-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--subtle);
+  }
+  .dot-legend-label {
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .dot-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .legend-dot[data-level="beginner"]     { background: #4caf50; }
+  .legend-dot[data-level="intermediate"] { background: #ff9800; }
+  .legend-dot[data-level="advanced"]     { background: #f44336; }
 </style>
 </head>
 <body>
@@ -292,10 +338,15 @@
   <div class="how-to-use-title">How to Use These Guides</div>
   <ol>
     <li data-step="1">Pick a deck by commander, color, theme, or playstyle using the search and filters below.</li>
-    <li data-step="2">Read the <strong>Executive Summary</strong> to understand the game plan at a glance.</li>
-    <li data-step="3">Use the <strong>Early / Mid / Late Game</strong> sections while learning the deck at the table.</li>
-    <li data-step="4">Open the <strong>Moxfield link</strong> inside the guide for the full decklist.</li>
+    <li data-step="2">Read the Executive Summary to understand the game plan at a glance.</li>
+    <li data-step="3">Use the Early, Mid, and Late Game sections while learning the deck at the table.</li>
+    <li data-step="4">Open the Moxfield link inside the guide for the full decklist.</li>
   </ol>
+</div>
+
+<div class="find-deck-header">
+  <div class="find-deck-title">Find a Deck</div>
+  <p class="find-deck-subtitle">Search by commander, color, theme, mechanic, or playstyle.</p>
 </div>
 
 <div class="discovery-area">
@@ -337,12 +388,18 @@
       <option value="UBRG">Non-White 4c</option>
       <option value="WUBRG">Five Color</option>
     </select>
-    <select class="filter-select" id="complexity-filter" aria-label="Filter by complexity">
-      <option value="">Any complexity</option>
+    <select class="filter-select" id="complexity-filter" aria-label="Filter by difficulty">
+      <option value="">Any difficulty</option>
       <option value="beginner">Beginner Friendly</option>
       <option value="intermediate">Intermediate</option>
       <option value="advanced">Advanced</option>
     </select>
+  </div>
+  <div class="dot-legend" aria-label="Difficulty legend">
+    <span class="dot-legend-label">Difficulty:</span>
+    <span class="dot-legend-item"><span class="legend-dot" data-level="beginner"></span>Beginner</span>
+    <span class="dot-legend-item"><span class="legend-dot" data-level="intermediate"></span>Intermediate</span>
+    <span class="dot-legend-item"><span class="legend-dot" data-level="advanced"></span>Advanced</span>
   </div>
   <div class="tag-chips" id="tag-chips" role="group" aria-label="Filter by tag">
     <button class="tag-chip" data-tag="tribal">Tribal</button>
